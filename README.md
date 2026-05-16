@@ -2,6 +2,8 @@
 
 A full-stack, enterprise-grade team task management application featuring granular role-based access control, workspace management, an immersive glassmorphic dark UI, and rich data visualization.
 
+Live URL - https://team-task-manager-production-4b60.up.railway.app
+
 ## ✨ Features
 
 - **Authentication** — Secure JWT-based registration and login with encrypted passwords.
