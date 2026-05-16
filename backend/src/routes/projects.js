@@ -2,10 +2,29 @@ const router = require('express').Router();
 const { Project, Workspace } = require('../db');
 const auth = require('../middleware/auth');
 
-// GET /api/projects/mine - Projects the current user is part of (via workspace membership)
+// GET /api/projects/mine - Projects owned by the user OR linked to their workspaces
 router.get('/mine', auth, async (req, res) => {
   try {
-    // Find all workspaces the user is a member of
+    const projectMap = new Map();
+
+    const formatProject = (p) => ({
+      id: p._id.toString(),
+      name: p.name,
+      description: p.description,
+      owner_id: p.owner_id.toString(),
+      status: p.status,
+      priority: p.priority,
+      deadline: p.deadline,
+      createdAt: p.createdAt
+    });
+
+    // 1. Projects directly owned by the user (regardless of workspace)
+    const ownedProjects = await Project.find({ owner_id: req.user._id });
+    for (const p of ownedProjects) {
+      projectMap.set(p._id.toString(), formatProject(p));
+    }
+
+    // 2. Projects linked to workspaces the user is a member of
     const workspaces = await Workspace.find({
       $or: [
         { owner_id: req.user._id },
@@ -13,21 +32,10 @@ router.get('/mine', auth, async (req, res) => {
       ]
     }).populate('projects');
 
-    // Collect unique projects from those workspaces
-    const projectMap = new Map();
     for (const ws of workspaces) {
       for (const p of ws.projects) {
         if (!projectMap.has(p._id.toString())) {
-          projectMap.set(p._id.toString(), {
-            id: p._id.toString(),
-            name: p.name,
-            description: p.description,
-            owner_id: p.owner_id.toString(),
-            status: p.status,
-            priority: p.priority,
-            deadline: p.deadline,
-            createdAt: p.createdAt
-          });
+          projectMap.set(p._id.toString(), formatProject(p));
         }
       }
     }

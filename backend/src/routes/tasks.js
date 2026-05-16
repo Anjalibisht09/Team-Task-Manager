@@ -88,7 +88,7 @@ router.post('/', auth, async (req, res) => {
       priority: priority || 'medium',
       due_date,
       project_id,
-      assignee_id,
+      assignee_id: assignee_id === '' ? undefined : assignee_id,
       creator_id: req.user._id,
       tags: tags || []
     });
@@ -157,7 +157,11 @@ router.put('/:id', auth, async (req, res) => {
     task.status = status ?? task.status;
     task.priority = priority ?? task.priority;
     task.due_date = due_date ?? task.due_date;
-    task.assignee_id = assignee_id ?? task.assignee_id;
+    
+    if (assignee_id !== undefined) {
+      task.assignee_id = assignee_id === '' ? undefined : assignee_id;
+    }
+    
     if (tags !== undefined) task.tags = tags;
     
     await task.save();

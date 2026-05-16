@@ -3,22 +3,22 @@
    ============================================ */
 
 /* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ---- CSS Variables ---- */
 :root {
   /* Brand */
-  --accent: #6366f1;
-  --accent-2: #8b5cf6;
-  --accent-glow: rgba(99, 102, 241, 0.35);
-  --accent-hover: #4f46e5;
+  --accent: #ffffff;
+  --accent-2: #e2e8f0;
+  --accent-glow: rgba(255, 255, 255, 0.15);
+  --accent-hover: #f1f5f9;
 
   /* Glass system */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-bg-hover: rgba(255, 255, 255, 0.08);
-  --glass-bg-strong: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.12);
-  --glass-border-hover: rgba(255, 255, 255, 0.22);
+  --glass-bg: rgba(24, 24, 27, 0.6);
+  --glass-bg-hover: rgba(39, 39, 42, 0.8);
+  --glass-bg-strong: rgba(9, 9, 11, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border-hover: rgba(255, 255, 255, 0.15);
   --glass-blur: blur(20px);
   --glass-blur-sm: blur(10px);
 
@@ -26,15 +26,15 @@
   --text-primary: rgba(255, 255, 255, 0.95);
   --text-secondary: rgba(255, 255, 255, 0.6);
   --text-muted: rgba(255, 255, 255, 0.35);
-  --text-dark: #0f172a;
+  --text-dark: #09090b;
 
   /* Surfaces */
-  --surface-1: rgba(15, 15, 35, 0.7);
-  --surface-2: rgba(20, 20, 50, 0.5);
+  --surface-1: rgba(9, 9, 11, 0.7);
+  --surface-2: rgba(24, 24, 27, 0.5);
 
   /* Status colors */
-  --todo: #6366f1;
-  --todo-glow: rgba(99, 102, 241, 0.3);
+  --todo: #94a3b8;
+  --todo-glow: rgba(148, 163, 184, 0.3);
   --inprogress: #f59e0b;
   --inprogress-glow: rgba(245, 158, 11, 0.3);
   --review: #3b82f6;
@@ -49,14 +49,14 @@
   --critical: #dc2626;
 
   /* Layout */
-  --radius: 16px;
-  --radius-sm: 10px;
-  --radius-lg: 24px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-lg: 16px;
   --nav-height: 68px;
 
   /* Shadows */
-  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
   --shadow-glow: 0 0 30px var(--accent-glow);
 }
 
@@ -72,9 +72,9 @@ html {
 }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   color: var(--text-primary);
-  background: #060918;
+  background: #000000;
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -197,8 +197,8 @@ body {
 
 .tf-input:focus {
   border-color: var(--accent);
-  background: rgba(99, 102, 241, 0.08);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
 }
 
 .tf-input::placeholder {
@@ -206,7 +206,7 @@ body {
 }
 
 .tf-input option {
-  background: #1a1a3e;
+  background: #09090b;
   color: white;
 }
 
@@ -239,13 +239,13 @@ body {
 
 .tf-btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  color: white;
-  box-shadow: 0 4px 20px rgba(99,102,241,0.4);
+  color: var(--text-dark);
+  box-shadow: 0 4px 20px rgba(255,255,255,0.15);
 }
 
 .tf-btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(99,102,241,0.6);
+  box-shadow: 0 8px 30px rgba(255,255,255,0.25);
 }
 
 .tf-btn-primary:active { transform: translateY(0); }
@@ -307,14 +307,12 @@ body {
 
 /* ---- Sidebar Layout ---- */
 .tf-sidebar {
-  width: 250px;
+  width: 220px;
   height: 100vh;
   position: sticky;
   top: 0;
-  background: rgba(6, 9, 24, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-right: 1px solid var(--glass-border);
+  background: #040404;
+  border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
   z-index: 100;
@@ -344,14 +342,18 @@ body {
     transform: translateX(0);
   }
   .sidebar-overlay {
-    display: block;
+    display: block !important;
   }
   .mobile-only {
-    display: block;
-  }
-  .mobile-topbar {
     display: flex !important;
   }
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+.desktop-only {
+  display: flex;
 }
 
 .close-sidebar {
@@ -366,10 +368,8 @@ body {
 .app-bg {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 80%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 70%),
-    linear-gradient(135deg, #060918 0%, #0d0d2b 50%, #080820 100%);
+    radial-gradient(ellipse at 50% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 60%),
+    linear-gradient(135deg, #000000 0%, #09090b 50%, #000000 100%);
   background-attachment: fixed;
   position: relative;
 }
@@ -379,8 +379,8 @@ body {
   position: fixed;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
   background-size: 60px 60px;
   pointer-events: none;
   z-index: 0;
@@ -433,7 +433,7 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(6, 9, 24, 0.75);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   display: flex;
@@ -445,12 +445,12 @@ body {
 }
 
 .modal-panel {
-  background: rgba(15, 15, 40, 0.9);
+  background: rgba(9, 9, 11, 0.9);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  box-shadow: 0 24px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
   width: 100%;
   animation: scaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
@@ -460,7 +460,7 @@ body {
 .tf-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid rgba(99,102,241,0.2);
+  border: 3px solid rgba(255,255,255,0.2);
   border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -516,4 +516,17 @@ body {
   .mobile-topbar {
     display: flex !important;
   }
+}
+
+/* Graph Tooltips */
+.activity-bar {
+  position: relative;
+  cursor: pointer;
+}
+.activity-bar:hover .bar-tooltip {
+  opacity: 1 !important;
+  transform: translateX(-50%) translateY(-2px) !important;
+}
+.activity-bar:hover .bar-fill {
+  filter: brightness(1.2);
 }

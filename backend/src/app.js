@@ -64,7 +64,7 @@ app.get('/api/dashboard', auth, async (req, res) => {
   try {
     const uid = req.user._id;
     
-    const { Task, Workspace } = require('./db');
+    const { Task, Workspace, Project } = require('./db');
     
     const myTasks = await Task.find({ assignee_id: uid })
       .populate('project_id', 'name')
@@ -77,11 +77,46 @@ app.get('/api/dashboard', auth, async (req, res) => {
       priority: t.priority,
       due_date: t.due_date,
       project_id: t.project_id._id.toString(),
-      project_name: t.project_id.name
+      project_name: t.project_id.name,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt
     }));
 
-    const now = new Date().toISOString().split('T')[0];
-    const overdue = mappedTasks.filter(t => t.due_date && t.due_date < now && t.status !== 'done');
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
+    const nextWeek = new Date(now);
+    nextWeek.setDate(now.getDate() + 7);
+    const nextWeekStr = nextWeek.toISOString().split('T')[0];
+
+    const overdue = mappedTasks.filter(t => t.due_date && t.due_date < todayStr && t.status !== 'done');
+    const upcoming = mappedTasks.filter(t => t.due_date && t.due_date >= todayStr && t.due_date <= nextWeekStr && t.status !== 'done').sort((a,b) => a.due_date.localeCompare(b.due_date));
+
+    const priorityStats = { low: 0, medium: 0, high: 0, critical: 0 };
+    mappedTasks.filter(t => t.status !== 'done').forEach(t => {
+      if (priorityStats[t.priority] !== undefined) priorityStats[t.priority]++;
+    });
+
+    const sevenDaysAgo = new Date(now); sevenDaysAgo.setDate(now.getDate() - 6);
+    sevenDaysAgo.setHours(0,0,0,0);
+    const fourteenDaysAgo = new Date(now); fourteenDaysAgo.setDate(now.getDate() - 13);
+    fourteenDaysAgo.setHours(0,0,0,0);
+    
+    const completedLast7 = mappedTasks.filter(t => t.status === 'done' && new Date(t.updatedAt) >= sevenDaysAgo).length;
+    const completedPrev7 = mappedTasks.filter(t => t.status === 'done' && new Date(t.updatedAt) >= fourteenDaysAgo && new Date(t.updatedAt) < sevenDaysAgo).length;
+    const completionTrend = completedPrev7 === 0 ? (completedLast7 > 0 ? 100 : 0) : Math.round(((completedLast7 - completedPrev7) / completedPrev7) * 100);
+
+    // Activity Data for the graph (Last 7 days)
+    const activityData = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      const shortDay = d.toLocaleDateString('en-US', { weekday: 'short' });
+      
+      const completedOnDay = mappedTasks.filter(t => t.status === 'done' && t.updatedAt && new Date(t.updatedAt).toISOString().split('T')[0] === dateStr).length;
+      activityData.push({ day: shortDay, date: dateStr, completed: completedOnDay });
+    }
 
     const stats = {
       total: mappedTasks.length,
@@ -90,6 +125,8 @@ app.get('/api/dashboard', auth, async (req, res) => {
       review: mappedTasks.filter(t => t.status === 'review').length,
       done: mappedTasks.filter(t => t.status === 'done').length,
       overdue: overdue.length,
+      completedLast7,
+      completionTrend
     };
 
     const workspaces = await Workspace.find({
@@ -99,7 +136,28 @@ app.get('/api/dashboard', auth, async (req, res) => {
       ]
     });
 
-    res.json({ stats, recentTasks: mappedTasks.slice(0, 6), overdueTasks: overdue.slice(0, 5), workspaceCount: workspaces.length });
+    const ownedProjects = await Project.find({ owner_id: uid });
+    const projectIds = new Set(ownedProjects.map(p => p._id.toString()));
+    workspaces.forEach(ws => ws.projects.forEach(p => projectIds.add(p.toString())));
+    
+    const allProjects = await Project.find({ _id: { $in: Array.from(projectIds) } });
+    const projectStats = {
+      active: allProjects.filter(p => p.status === 'active').length,
+      completed: allProjects.filter(p => p.status === 'completed').length,
+      onHold: allProjects.filter(p => p.status === 'on-hold').length,
+      total: allProjects.length
+    };
+
+    res.json({ 
+      stats, 
+      priorityStats,
+      projectStats,
+      activityData,
+      recentTasks: mappedTasks.slice(0, 6), 
+      overdueTasks: overdue.slice(0, 5), 
+      upcomingTasks: upcoming.slice(0, 5),
+      workspaceCount: workspaces.length 
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
